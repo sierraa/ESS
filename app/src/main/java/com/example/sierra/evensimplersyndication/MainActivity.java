@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
     int USER_ID = -1; // this field will store the user ID
-    static String MY_DISPLAY_NAME = null;
+    static String MY_DISPLAY_NAME = "DEFAULT";
     // Instantiate the RequestQueue.
     RequestQueue queue = null;
 
@@ -212,8 +212,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static class ProfileFragment extends Fragment {
         // TODO: create and add a view for the profile
-
-        // public ProfileFragment() {} // is this necessary
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,

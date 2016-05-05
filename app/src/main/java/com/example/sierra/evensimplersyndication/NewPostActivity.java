@@ -17,11 +17,15 @@ public class NewPostActivity extends AppCompatActivity {
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Add a new post", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//                startActivity(intent);
+                // Call the method to add a post
                 finish();
             }
+        });
+
+        Button cancel = (Button) findViewById(R.id.cancelPostButton);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { finish(); }
         });
     }
 }
