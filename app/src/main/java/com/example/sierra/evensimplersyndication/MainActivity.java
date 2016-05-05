@@ -111,7 +111,15 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            switch (position) {
+                case 0:
+                    return PlaceholderFragment.newInstance(position);
+                case 1:
+                    return PlaceholderFragment.newInstance(position);
+                case 2:
+                    return new ProfileFragment();
+            }
+            return PlaceholderFragment.newInstance(position); // should never get here
         }
 
         @Override
@@ -131,6 +139,50 @@ public class MainActivity extends AppCompatActivity {
                     return "PROFILE";
             }
             return null;
+        }
+    }
+
+    private void getPosts(int userID) {
+        // TODO: connect routes. Retrieve some posts relevant to this user. Should the user ID be an int?
+        getInterests(userID);
+    }
+
+    private void getInterests(int userID) {
+        // TODO: connect routes. Retrieve interests relevant to this user.
+    }
+
+    private void addInterest(int userID) {
+        // TODO: connect routes. Add an interest.
+    }
+
+    private void getUsers() {
+        // TODO: show the users in the database
+    }
+
+    private void getEmail() {
+        // TODO: get the users email for displaying info on their profile
+    }
+
+    public static class PostFragment extends Fragment {
+        // TODO: create and add a view for posts
+    }
+
+    public static class UsersFragment extends Fragment {
+        // TODO: create and add a view for the users
+    }
+
+    public static class ProfileFragment extends Fragment {
+        // TODO: create and add a view for the profile
+
+        public ProfileFragment() {} // is this necessary
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            textView.setText("This the profile.");
+            return rootView;
         }
     }
 

@@ -239,6 +239,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    private void findOrAddUser(String email, String password) {
+        // TODO: connect routes. Should this be void or should it return the user number? How to pass to the main activity?
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
