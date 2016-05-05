@@ -20,7 +20,22 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
+
+    String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
+    int USER_ID = -1; // this field will store the user ID
+    static String MY_DISPLAY_NAME = null;
+    // Instantiate the RequestQueue.
+    RequestQueue queue = null;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -41,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            USER_ID = extras.getInt("USER_ID");
+            MY_DISPLAY_NAME = extras.getString("MY_DISPLAY_NAME");
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -113,9 +134,9 @@ public class MainActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return PlaceholderFragment.newInstance(position);
+                    return new PostStreamFragment();
                 case 1:
-                    return PlaceholderFragment.newInstance(position);
+                    return new UsersFragment();
                 case 2:
                     return new ProfileFragment();
             }
@@ -159,29 +180,47 @@ public class MainActivity extends AppCompatActivity {
         // TODO: show the users in the database
     }
 
-    private void getEmail() {
-        // TODO: get the users email for displaying info on their profile
+    public static String getEmail() {
+        return MY_DISPLAY_NAME;
     }
 
-    public static class PostFragment extends Fragment {
-        // TODO: create and add a view for posts
-    }
-
-    public static class UsersFragment extends Fragment {
-        // TODO: create and add a view for the users
-    }
-
-    public static class ProfileFragment extends Fragment {
-        // TODO: create and add a view for the profile
-
-        public ProfileFragment() {} // is this necessary
+    public static class PostStreamFragment extends Fragment {
+        // TODO: create and add a view for posts... this will be a container for post fragments
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText("This the profile.");
+            textView.setText("Here are where the posts will be.");
+            return rootView;
+        }
+    }
+
+    public static class UsersFragment extends Fragment {
+        // TODO: create and add a view for the users
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            textView.setText("Here are the users");
+            return rootView;
+        }
+    }
+
+    public static class ProfileFragment extends Fragment {
+        // TODO: create and add a view for the profile
+
+        // public ProfileFragment() {} // is this necessary
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.my_profile, container, false);
+            TextView textView = (TextView) rootView.findViewById(R.id.myUsername);
+            textView.setText(MainActivity.getEmail());
             return rootView;
         }
     }
@@ -220,4 +259,79 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
     }
+
 }
+//
+//
+//    public void addInterest(View view) throws JSONException {
+//        queue = Volley.newRequestQueue(this);
+//        EditText userIdText = (EditText) findViewById(R.id.add_interest_id);
+//        // need to parse the comma delimited input
+//        EditText interestsText = (EditText) findViewById(R.id.add_interests);
+//        final TextView addInterestStatusText = (TextView) findViewById(R.id.add_interest__status_banner);
+//        String userid = userIdText.getText().toString();
+//        String url = baseurl + "/addInterest";
+//        final int[] numAdded = {0};
+//        for (String interest: interestsText.getText().toString().split(",")) {
+//            final String trimmed = interest.trim();
+//            if (!trimmed.isEmpty()) {
+//                final JSONObject jsonRequestBody = new JSONObject("{\"id\":\"" + userid + "\",\"interest\":" + "\"" + trimmed + "\"}");
+//                JsonObjectRequest jsObjRequest = new JsonObjectRequest
+//                        (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
+//
+//                            @Override
+//                            public void onResponse(JSONObject response) {
+//                                numAdded[0]++;
+//                                addInterestStatusText.setText("Added " + numAdded[0]);
+//                            }
+//                        }, new Response.ErrorListener() {
+//
+//                            @Override
+//                            public void onErrorResponse(VolleyError error) {
+//                                addInterestStatusText.setText("Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
+//                            }
+//                        });
+//                // Add the request to the RequestQueue.
+//                queue.add(jsObjRequest);
+//            }
+//        }
+//    }
+//
+//    public void selectInterest(View view) throws JSONException {
+//        queue = Volley.newRequestQueue(this);
+//        EditText userIdText = (EditText) findViewById(R.id.select_user_interest_edit_text);
+//        final String userid = userIdText.getText().toString();
+//        String url = baseurl + "/getInterestsByUserID";
+//        final TextView selectUserInterestStatusText = (TextView) findViewById(R.id.select_interest__status_banner);
+//
+//        final JSONObject jsonRequestBody = new JSONObject("{\"id\":\"" + userid + "\"}");
+//        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+//                (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
+//
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            String interests = "";
+//                            JSONArray interestsArr = response.getJSONArray("interests");
+//                            if (interestsArr.length() > 0) {
+//                                interests += interestsArr.get(0);
+//                            }
+//                            for (int i = 1; i < interestsArr.length(); i++) {
+//                                interests += ", " + interestsArr.get(i);
+//                            }
+//                            selectUserInterestStatusText.setText("User with id: " + response.get("id") + " has these interests: " + interests);
+//                        } catch (JSONException e) {
+//                            selectUserInterestStatusText.setText("Response JSON malformed: " + response.toString());
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        selectUserInterestStatusText.setText("Could not fetch user interests with id: " + userid + ", with error: " + error.toString());
+//                    }
+//                });
+//        // Add the request to the RequestQueue.
+//        queue.add(jsObjRequest);
+//    }
+//}

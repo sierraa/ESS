@@ -2,6 +2,8 @@ package com.example.sierra.evensimplersyndication;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 public class NewPostActivity extends AppCompatActivity {
 
@@ -10,5 +12,16 @@ public class NewPostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
         setTitle("Add Post");
+
+        Button post = (Button) findViewById(R.id.addNewPost);
+        post.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Add a new post", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                startActivity(intent);
+                finish();
+            }
+        });
     }
 }

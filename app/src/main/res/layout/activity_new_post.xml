@@ -18,14 +18,14 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/editText2"
-        android:layout_alignEnd="@+id/editText2" />
+        android:layout_alignRight="@+id/descriptionField"
+        android:layout_alignEnd="@+id/descriptionField" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Post"
-        android:id="@+id/button"
+        android:id="@+id/addNewPost"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -36,7 +36,7 @@
         android:inputType="textMultiLine"
         android:hint="Say something about your link here"
         android:ems="10"
-        android:id="@+id/editText2"
+        android:id="@+id/descriptionField"
         android:layout_alignTop="@+id/editText"
         android:layout_marginTop="67dp"
         android:layout_alignParentLeft="true"
@@ -48,11 +48,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="Tags (comma separated)"
-        android:id="@+id/editText3"
-        android:layout_below="@+id/editText2"
+        android:id="@+id/tagsField"
+        android:layout_below="@+id/descriptionField"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:id="@+id/cancelPostButton"
+        android:layout_alignTop="@+id/addNewPost"
+        android:layout_toRightOf="@+id/addNewPost"
+        android:layout_toEndOf="@+id/addNewPost" />
 
 </RelativeLayout>

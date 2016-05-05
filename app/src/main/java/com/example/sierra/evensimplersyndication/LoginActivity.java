@@ -3,6 +3,9 @@ package com.example.sierra.evensimplersyndication;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -30,6 +33,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +52,11 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
+    String BASE_URL ="http://ec2-54-173-215-12.compute-1.amazonaws.com";
+    int USER_ID = -1;
+    String MY_DISPLAY_NAME = null;
+    // Instantiate the RequestQueue.
+    RequestQueue queue = null;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -161,7 +178,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -185,10 +202,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            try {
+                findOrAddUser(email, password);
+            } catch (JSONException e) {
+                showLoginMessage("YIKES!!!!!!!!!");
+            }
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
             Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("USER_ID", USER_ID);
+            intent.putExtra("MY_DISPLAY_NAME", MY_DISPLAY_NAME);
             startActivity(intent);
         }
     }
@@ -239,9 +263,101 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private void findOrAddUser(String email, String password) {
-        // TODO: connect routes. Should this be void or should it return the user number? How to pass to the main activity?
+    private void showLoginMessage(String message) {
+        // Probably just want this for debugging
+        // isn't working as of now
+        Context context = LoginActivity.this;
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        final EditText et = new EditText(context);
+
+        alertDialogBuilder.setView(et);
+
+        // set dialog message
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setMessage(message);
+        // show it
+        alertDialog.show();
     }
+
+    /**
+     * If the user exists, get their ID.
+     * Otherwise create a new user.
+     * @param email
+     * @param password
+     * @throws JSONException
+     */
+    private void findOrAddUser(String email, String password) throws JSONException {
+        queue = Volley.newRequestQueue(this);
+        String getUrl = BASE_URL + "/getUserByUsernamePassword";
+        String addUrl = BASE_URL + "/addUser";
+        final JSONObject jsonRequestBody = new JSONObject();
+        final String username = email;
+        jsonRequestBody.put("name", email);
+        jsonRequestBody.put("password", password);
+        // first see if the user is in the db
+        JsonObjectRequest jsObjRequestGet = new JsonObjectRequest
+                (Request.Method.POST, getUrl, jsonRequestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        String id = null;
+                        try {
+                            id = response.getString("ID");
+                            USER_ID = new Integer(id);
+                            MY_DISPLAY_NAME = username.split("@")[0];
+                            System.out.println("user id is " + id);
+                            System.out.println("Found user: " + username);
+                        } catch (JSONException e) {
+                            return; // do nothing
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        System.out.println("Finding User: " + username + " failed! " +
+                                "With request JSON: " + jsonRequestBody.toString()
+                                + ", and error: " + error.toString());
+                    }
+                });
+        // Add the request to the RequestQueue.
+        queue.add(jsObjRequestGet);
+
+        if (USER_ID != -1) return;
+
+        JsonObjectRequest jsObjRequestAdd = new JsonObjectRequest
+                    (Request.Method.POST, addUrl, jsonRequestBody, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                System.out.println("Added user: " + username);
+                                String id = response.getString("ID");
+                                USER_ID = new Integer(id);
+                            } catch (JSONException e) {
+                                return; // do nothing for now
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            System.out.println("Adding User: " + username + " failed! " +
+                                    "With request JSON: " + jsonRequestBody.toString()
+                                    + ", and error: " + error.toString());
+                        }
+                    });
+
+            queue.add(jsObjRequestAdd);
+        }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
