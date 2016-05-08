@@ -203,7 +203,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             try {
-                findOrAddUser(email, password);
+                findUser(email, password);
             } catch (JSONException e) {
                 showLoginMessage("YIKES!!!!!!!!!");
             }
@@ -297,68 +297,77 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * @param password User's password in plaintext
      * @throws JSONException
      */
-    private void findOrAddUser(String email, String password) throws JSONException {
+    private void findUser(final String email, final String password) throws JSONException {
         queue = Volley.newRequestQueue(this);
-        String getUrl = BASE_URL + "/getUserByUsernamePassword";
-        String addUrl = BASE_URL + "/addUser";
+
+        final String getUrl = BASE_URL + "/getUserByUsernamePassword";
+
         final JSONObject jsonRequestBody = new JSONObject();
-        final String username = email;
         jsonRequestBody.put("name", email);
         jsonRequestBody.put("password", password);
-        // first see if the user is in the db
+
+        // First see if the user is in the db
         JsonObjectRequest jsObjRequestGet = new JsonObjectRequest
                 (Request.Method.POST, getUrl, jsonRequestBody, new Response.Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
                             USER_ID = Integer.valueOf(response.getString("ID"));
-                            MY_DISPLAY_NAME = username.split("@")[0];
+                            MY_DISPLAY_NAME = email.split("@")[0];
                             Log.i(TAG, "User id is " + USER_ID);
-                            Log.i(TAG, "Found user: " + username);
+                            Log.i(TAG, "Found user: " + email);
                             proceedToMain();
                         } catch (JSONException e) {
                             // do nothing
                         }
                     }
                 }, new Response.ErrorListener() {
-
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "Finding User: " + username + " failed! " +
+                        Log.e(TAG, "Couldn't find user " + email + ", attempting to register.");
+
+                        try {
+                            addUser(email, password);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsObjRequestGet);
+    }
+
+    private void addUser(final String email, String password) throws JSONException {
+        final String addUrl = BASE_URL + "/addUser";
+
+        final JSONObject jsonRequestBody = new JSONObject();
+        jsonRequestBody.put("name", email);
+        jsonRequestBody.put("password", password);
+
+        JsonObjectRequest jsObjRequestAdd = new JsonObjectRequest
+                (Request.Method.POST, addUrl, jsonRequestBody, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Log.i(TAG, "Added user: " + email);
+                            USER_ID = Integer.valueOf(response.getString("ID"));
+                            proceedToMain();
+                        } catch (JSONException e) {
+                            // do nothing for now
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Adding user " + email + " failed! " +
                                 "With request JSON: " + jsonRequestBody.toString()
                                 + ", and error: " + error.toString());
                     }
                 });
-        // Add the request to the RequestQueue.
-        queue.add(jsObjRequestGet);
 
-        if (USER_ID != -1) return;
-
-        JsonObjectRequest jsObjRequestAdd = new JsonObjectRequest
-                    (Request.Method.POST, addUrl, jsonRequestBody, new Response.Listener<JSONObject>() {
-
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                Log.i(TAG, "Added user: " + username);
-                                USER_ID = Integer.valueOf(response.getString("ID"));
-                            } catch (JSONException e) {
-                                // do nothing for now
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e(TAG, "Adding User: " + username + " failed! " +
-                                    "With request JSON: " + jsonRequestBody.toString()
-                                    + ", and error: " + error.toString());
-                        }
-                    });
-
-            queue.add(jsObjRequestAdd);
-        }
+        queue.add(jsObjRequestAdd);
+    }
 
 
     @Override
