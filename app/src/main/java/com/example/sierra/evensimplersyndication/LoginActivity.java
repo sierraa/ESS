@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -61,6 +62,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
+    private static final String TAG = "LoginActivity";
     String BASE_URL ="http://ec2-54-173-215-12.compute-1.amazonaws.com";
     int USER_ID = -1;
     String MY_DISPLAY_NAME = null;
@@ -310,8 +312,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             id = response.getString("ID");
                             USER_ID = new Integer(id);
                             MY_DISPLAY_NAME = username.split("@")[0];
-                            System.out.println("user id is " + id);
-                            System.out.println("Found user: " + username);
+                            Log.i(TAG, "User id is " + id);
+                            Log.i(TAG, "Found user: " + username);
                         } catch (JSONException e) {
                             return; // do nothing
                         }
@@ -320,7 +322,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        System.out.println("Finding User: " + username + " failed! " +
+                        Log.e(TAG, "Finding User: " + username + " failed! " +
                                 "With request JSON: " + jsonRequestBody.toString()
                                 + ", and error: " + error.toString());
                     }
@@ -336,7 +338,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
-                                System.out.println("Added user: " + username);
+                                Log.i(TAG, "Added user: " + username);
                                 String id = response.getString("ID");
                                 USER_ID = new Integer(id);
                             } catch (JSONException e) {
@@ -347,7 +349,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            System.out.println("Adding User: " + username + " failed! " +
+                            Log.e(TAG, "Adding User: " + username + " failed! " +
                                     "With request JSON: " + jsonRequestBody.toString()
                                     + ", and error: " + error.toString());
                         }
