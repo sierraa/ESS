@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -90,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        queue = Volley.newRequestQueue(this);
+
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -141,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getInterests(final int userID) throws JSONException {
-        queue = Volley.newRequestQueue(this);
         String getUrl = BASE_URL + "/getInterestsByUserID";
         final JSONObject jsonRequestBody = new JSONObject();
         jsonRequestBody.put("id", userID);
@@ -168,8 +170,36 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsObjRequestGet);
     }
 
-    private void addInterest(int userID) {
-        // TODO: connect routes. Add an interest.
+    public void addInterest(View view) throws JSONException {
+        EditText interestsText = (EditText) findViewById(R.id.addInterest);
+        assert interestsText != null;
+
+        String url = BASE_URL + "/addInterest";
+
+        // Parse the comma delimited input
+        for (String interest : interestsText.getText().toString().split(",")) {
+            final String trimmed = interest.trim();
+            if (!trimmed.isEmpty()) {
+                final JSONObject jsonRequestBody = new JSONObject(",\"interest\":" + "\"" + trimmed + "\"}");
+                jsonRequestBody.put("id", USER_ID);
+                jsonRequestBody.put("interest", trimmed);
+
+                JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                        (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Log.i(TAG, "Added an interest");
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.e(TAG, "Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
+                            }
+                        });
+                // Add the request to the RequestQueue.
+                queue.add(jsObjRequest);
+            }
+        }
     }
 
     private void getUsers() {
@@ -296,42 +326,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-//
-//
-//    public void addInterest(View view) throws JSONException {
-//        queue = Volley.newRequestQueue(this);
-//        EditText userIdText = (EditText) findViewById(R.id.add_interest_id);
-//        // need to parse the comma delimited input
-//        EditText interestsText = (EditText) findViewById(R.id.add_interests);
-//        final TextView addInterestStatusText = (TextView) findViewById(R.id.add_interest__status_banner);
-//        String userid = userIdText.getText().toString();
-//        String url = baseurl + "/addInterest";
-//        final int[] numAdded = {0};
-//        for (String interest: interestsText.getText().toString().split(",")) {
-//            final String trimmed = interest.trim();
-//            if (!trimmed.isEmpty()) {
-//                final JSONObject jsonRequestBody = new JSONObject("{\"id\":\"" + userid + "\",\"interest\":" + "\"" + trimmed + "\"}");
-//                JsonObjectRequest jsObjRequest = new JsonObjectRequest
-//                        (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
-//
-//                            @Override
-//                            public void onResponse(JSONObject response) {
-//                                numAdded[0]++;
-//                                addInterestStatusText.setText("Added " + numAdded[0]);
-//                            }
-//                        }, new Response.ErrorListener() {
-//
-//                            @Override
-//                            public void onErrorResponse(VolleyError error) {
-//                                addInterestStatusText.setText("Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
-//                            }
-//                        });
-//                // Add the request to the RequestQueue.
-//                queue.add(jsObjRequest);
-//            }
-//        }
-//    }
-//
 //    public void selectInterest(View view) throws JSONException {
 //        queue = Volley.newRequestQueue(this);
 //        EditText userIdText = (EditText) findViewById(R.id.select_user_interest_edit_text);
