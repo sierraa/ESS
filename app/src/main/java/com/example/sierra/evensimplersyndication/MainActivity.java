@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         for (String interest : interestsText.getText().toString().split(",")) {
             final String trimmed = interest.trim();
             if (!trimmed.isEmpty()) {
-                final JSONObject jsonRequestBody = new JSONObject(",\"interest\":" + "\"" + trimmed + "\"}");
+                final JSONObject jsonRequestBody = new JSONObject();
                 jsonRequestBody.put("id", USER_ID);
                 jsonRequestBody.put("interest", trimmed);
 
@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(JSONObject response) {
                                 Log.i(TAG, "Added an interest");
+                                ((EditText) findViewById(R.id.addInterest)).getText().clear();
                             }
                         }, new Response.ErrorListener() {
                             @Override

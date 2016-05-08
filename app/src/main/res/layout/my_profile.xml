@@ -43,6 +43,7 @@
             android:layout_gravity="right"
             android:layout_toEndOf="@+id/addInterest"
             android:layout_toRightOf="@+id/addInterest"
+            android:onClick="addInterest"
             android:text="Add" />
     </RelativeLayout>
 
