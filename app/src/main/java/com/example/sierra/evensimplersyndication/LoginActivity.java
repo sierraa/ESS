@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String TAG = "LoginActivity";
     String BASE_URL ="http://ec2-54-173-215-12.compute-1.amazonaws.com";
     int USER_ID = -1;
-    String MY_DISPLAY_NAME = null;
+    String MY_DISPLAY_NAME;
     // Instantiate the RequestQueue.
     RequestQueue queue = null;
     /**
@@ -209,12 +209,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("USER_ID", USER_ID);
-            intent.putExtra("MY_DISPLAY_NAME", MY_DISPLAY_NAME);
-            intent.putExtra("EMAIL", mEmailView.getText());
-            startActivity(intent);
         }
+    }
+
+    private void proceedToMain() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("USER_ID", USER_ID);
+        intent.putExtra("MY_DISPLAY_NAME", MY_DISPLAY_NAME);
+        intent.putExtra("EMAIL", mEmailView.getText());
+        startActivity(intent);
     }
 
     private boolean isEmailValid(String email) {
@@ -307,13 +310,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        String id = null;
                         try {
-                            id = response.getString("ID");
-                            USER_ID = new Integer(id);
+                            USER_ID = Integer.valueOf(response.getString("ID"));
                             MY_DISPLAY_NAME = username.split("@")[0];
-                            Log.i(TAG, "User id is " + id);
+                            Log.i(TAG, "User id is " + USER_ID);
                             Log.i(TAG, "Found user: " + username);
+                            proceedToMain();
                         } catch (JSONException e) {
                             return; // do nothing
                         }
