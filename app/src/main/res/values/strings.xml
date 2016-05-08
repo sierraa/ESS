@@ -75,4 +75,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="profile_image">Profile image</string>
+    <string name="add_interests">Add comma separated interests</string>
+    <string name="add">Add</string>
 </resources>
