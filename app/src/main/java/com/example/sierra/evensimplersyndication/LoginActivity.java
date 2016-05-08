@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     int USER_ID = -1;
     String MY_DISPLAY_NAME;
     // Instantiate the RequestQueue.
-    RequestQueue queue = null;
+    RequestQueue queue;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -83,6 +83,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        queue = Volley.newRequestQueue(this);
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -298,8 +300,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * @throws JSONException
      */
     private void findUser(final String email, final String password) throws JSONException {
-        queue = Volley.newRequestQueue(this);
-
         final String getUrl = BASE_URL + "/getUserByUsernamePassword";
 
         final JSONObject jsonRequestBody = new JSONObject();

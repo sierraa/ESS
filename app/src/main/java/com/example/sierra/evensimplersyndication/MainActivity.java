@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     int USER_ID = -1; // this field will store the user ID
     JSONArray interests;
     // Instantiate the RequestQueue.
-    RequestQueue queue = null;
+    RequestQueue queue;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        queue = Volley.newRequestQueue(this);
 
         setTitle("ESS");
 
@@ -91,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        queue = Volley.newRequestQueue(this);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
