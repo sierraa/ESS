@@ -100,6 +100,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        assert mEmailSignInButton != null;
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -292,8 +293,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * If the user exists, get their ID.
      * Otherwise create a new user.
-     * @param email
-     * @param password
+     * @param email User's email
+     * @param password User's password in plaintext
      * @throws JSONException
      */
     private void findOrAddUser(String email, String password) throws JSONException {
@@ -317,7 +318,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             Log.i(TAG, "Found user: " + username);
                             proceedToMain();
                         } catch (JSONException e) {
-                            return; // do nothing
+                            // do nothing
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -341,10 +342,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         public void onResponse(JSONObject response) {
                             try {
                                 Log.i(TAG, "Added user: " + username);
-                                String id = response.getString("ID");
-                                USER_ID = new Integer(id);
+                                USER_ID = Integer.valueOf(response.getString("ID"));
                             } catch (JSONException e) {
-                                return; // do nothing for now
+                                // do nothing for now
                             }
                         }
                     }, new Response.ErrorListener() {
