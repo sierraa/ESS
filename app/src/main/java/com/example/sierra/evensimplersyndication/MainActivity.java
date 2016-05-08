@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,14 +19,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private static String MY_DISPLAY_NAME;
     private static String EMAIL;
     String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
     int USER_ID = -1; // this field will store the user ID
+    JSONArray interests;
     // Instantiate the RequestQueue.
     RequestQueue queue = null;
 
@@ -72,6 +84,12 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle("ESS");
 
+        try {
+            getPosts(USER_ID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -117,13 +135,37 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void getPosts(int userID) {
+    private void getPosts(int userID) throws JSONException {
         // TODO: connect routes. Retrieve some posts relevant to this user. Should the user ID be an int?
         getInterests(userID);
     }
 
-    private void getInterests(int userID) {
-        // TODO: connect routes. Retrieve interests relevant to this user.
+    private void getInterests(final int userID) throws JSONException {
+        queue = Volley.newRequestQueue(this);
+        String getUrl = BASE_URL + "/getInterestsByUserID";
+        final JSONObject jsonRequestBody = new JSONObject();
+        jsonRequestBody.put("id", userID);
+        JsonObjectRequest jsObjRequestGet = new JsonObjectRequest
+                (Request.Method.POST, getUrl, jsonRequestBody, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            interests = response.getJSONArray("interests");
+                            Log.i(TAG, interests.toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Finding interests of user with ID " + userID + " failed. " +
+                                "With request JSON: " + jsonRequestBody.toString()
+                                + ", and error: " + error.toString());
+                    }
+                });
+        // Add the request to the RequestQueue.
+        queue.add(jsObjRequestGet);
     }
 
     private void addInterest(int userID) {
