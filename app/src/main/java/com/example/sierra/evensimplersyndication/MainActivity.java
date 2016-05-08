@@ -22,7 +22,7 @@ import com.android.volley.RequestQueue;
 
 public class MainActivity extends AppCompatActivity {
 
-    static String MY_DISPLAY_NAME = "DEFAULT";
+    private static String MY_DISPLAY_NAME;
     private static String EMAIL;
     String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
     int USER_ID = -1; // this field will store the user ID
@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    public static String getUsername() {
+        return MY_DISPLAY_NAME;
+    }
 
     public static String getEmail() {
         return EMAIL;
@@ -164,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.my_profile, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.myUsername);
-            textView.setText(MainActivity.getEmail());
+            textView.setText((MainActivity.getUsername() != null) ? MainActivity.getUsername() : "(no username)");
             return rootView;
         }
     }
