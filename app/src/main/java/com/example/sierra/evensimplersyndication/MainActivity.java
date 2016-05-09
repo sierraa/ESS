@@ -32,6 +32,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private static String EMAIL;
     static String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
     static int USER_ID = -1; // this field will store the user ID
-    JSONArray interests;
+
     // Instantiate the RequestQueue.
     static RequestQueue queue;
 
@@ -141,11 +143,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getPosts(int userID) throws JSONException {
-        // TODO: connect routes. Retrieve some posts relevant to this user. Should the user ID be an int?
-        getInterests(userID);
+        // TODO: connect routes. Retrieve some posts relevant to this user.
+        String[] interests = getInterests(userID);
     }
 
-    private void getInterests(final int userID) throws JSONException {
+    private String[] getInterests(final int userID) throws JSONException { // this needs to return something
+        final ArrayList<String> userInterests = new ArrayList<String>();
         String getUrl = BASE_URL + "/getInterestsByUserID";
         final JSONObject jsonRequestBody = new JSONObject();
         jsonRequestBody.put("id", userID);
@@ -154,7 +157,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            interests = response.getJSONArray("interests");
+                            JSONArray interests = response.getJSONArray("interests");
+                            for (int i=0;i<interests.length();i++){
+                                userInterests.add(interests.get(i).toString());
+                            }
                             Log.i(TAG, interests.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -170,13 +176,14 @@ public class MainActivity extends AppCompatActivity {
                 });
         // Add the request to the RequestQueue.
         queue.add(jsObjRequestGet);
+        return (String[]) userInterests.toArray();
     }
 
     private void getUsers() {
         // TODO: show the users in the database
     }
 
-    public static class PostStreamFragment extends Fragment {
+    public static class PostStreamFragmentContainer extends Fragment {
         // TODO: create and add a view for posts... this will be a container for post fragments
 
         @Override
@@ -189,8 +196,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class UsersFragment extends Fragment {
-        // TODO: create and add a view for the users
+    public static class UsersFragmentContainer extends Fragment {
+        // TODO: create and add a view for the users... this will be a container for user fragments
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -315,9 +322,9 @@ public class MainActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return new PostStreamFragment();
+                    return new PostStreamFragmentContainer();
                 case 1:
-                    return new UsersFragment();
+                    return new UsersFragmentContainer();
                 case 2:
                     return new ProfileFragment();
             }
