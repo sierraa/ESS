@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         final Intent intent = new Intent(this, NewPostActivity.class);
+        intent.putExtra("USER_ID", USER_ID);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
