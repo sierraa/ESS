@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -36,11 +37,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static String MY_DISPLAY_NAME;
     private static String EMAIL;
-    String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
-    int USER_ID = -1; // this field will store the user ID
+    static String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
+    static int USER_ID = -1; // this field will store the user ID
     JSONArray interests;
     // Instantiate the RequestQueue.
-    RequestQueue queue;
+    static RequestQueue queue;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -171,39 +172,6 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsObjRequestGet);
     }
 
-    public void addInterest(View view) throws JSONException {
-        EditText interestsText = (EditText) findViewById(R.id.addInterest);
-        assert interestsText != null;
-
-        String url = BASE_URL + "/addInterest";
-
-        // Parse the comma delimited input
-        for (String interest : interestsText.getText().toString().split(",")) {
-            final String trimmed = interest.trim();
-            if (!trimmed.isEmpty()) {
-                final JSONObject jsonRequestBody = new JSONObject();
-                jsonRequestBody.put("id", USER_ID);
-                jsonRequestBody.put("interest", trimmed);
-
-                JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                        (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                Log.i(TAG, "Added an interest");
-                                ((EditText) findViewById(R.id.addInterest)).getText().clear();
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.e(TAG, "Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
-                            }
-                        });
-                // Add the request to the RequestQueue.
-                queue.add(jsObjRequest);
-            }
-        }
-    }
-
     private void getUsers() {
         // TODO: show the users in the database
     }
@@ -235,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class ProfileFragment extends Fragment {
+        // These need to be static so moving addInterest to be local to the ProfileFragment
         // TODO: create and add a view for the profile
 
         @Override
@@ -243,8 +212,56 @@ public class MainActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.my_profile, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.myUsername);
             textView.setText((MainActivity.getUsername() != null) ? MainActivity.getUsername() : "(no username)");
+
+            Button addInterests = (Button) rootView.findViewById(R.id.addInterestButton);
+            addInterests.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        addInterest(view);
+                    } catch (JSONException e) {
+                        // do nothing for now
+                    }
+
+                }
+            });
+
             return rootView;
         }
+
+        public void addInterest(final View view) throws JSONException {
+            EditText interestsText = (EditText) view.findViewById(R.id.addInterest);
+            assert interestsText != null;
+
+            String url = BASE_URL + "/addInterest";
+
+            // Parse the comma delimited input
+            for (String interest : interestsText.getText().toString().split(",")) {
+                final String trimmed = interest.trim();
+                if (!trimmed.isEmpty()) {
+                    final JSONObject jsonRequestBody = new JSONObject();
+                    jsonRequestBody.put("id", USER_ID);
+                    jsonRequestBody.put("interest", trimmed);
+
+                    JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                            (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    Log.i(TAG, "Added an interest");
+                                    ((EditText) view.findViewById(R.id.addInterest)).getText().clear();
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e(TAG, "Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
+                                }
+                            });
+                    // Add the request to the RequestQueue.
+                    queue.add(jsObjRequest);
+                }
+            }
+        }
+
     }
 
     /**
