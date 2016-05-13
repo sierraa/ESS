@@ -37,13 +37,13 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static String MY_DISPLAY_NAME;
-    private static String EMAIL;
     static String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
     static int USER_ID = -1; // this field will store the user ID
-
     // Instantiate the RequestQueue.
     static RequestQueue queue;
+    private static String MY_DISPLAY_NAME;
+    private static String EMAIL;
+    final ArrayList<String> userInterests = new ArrayList<String>();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -144,11 +144,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void getPosts(int userID) throws JSONException {
         // TODO: connect routes. Retrieve some posts relevant to this user.
-        String[] interests = getInterests(userID);
+        getInterests(userID);
     }
 
-    private String[] getInterests(final int userID) throws JSONException { // this needs to return something
-        final ArrayList<String> userInterests = new ArrayList<String>();
+    // Shouldn't return anything since the request is asynchronous
+    private void getInterests(final int userID) throws JSONException {
         String getUrl = BASE_URL + "/getInterestsByUserID";
         final JSONObject jsonRequestBody = new JSONObject();
         jsonRequestBody.put("id", userID);
@@ -176,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
                 });
         // Add the request to the RequestQueue.
         queue.add(jsObjRequestGet);
-        return (String[]) userInterests.toArray();
     }
 
     private void getUsers() {
