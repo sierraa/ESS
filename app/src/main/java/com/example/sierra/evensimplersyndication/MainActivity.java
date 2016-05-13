@@ -36,7 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    static final ArrayList<String> userInterests = new ArrayList<String>();
+    static final ArrayList<String> userInterests = new ArrayList<>();
     // Model stuff
     private static final String TAG = "MainActivity";
     static String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText("Here are where the posts will be.");
+            textView.setText(R.string.postsHere);
             return rootView;
         }
     }
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText("Here are the users");
+            textView.setText(R.string.usersHere);
             return rootView;
         }
     }
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
             textView.setText((MainActivity.getUsername() != null) ? MainActivity.getUsername() : "(no username)");
 
             ListView listView = (ListView) rootView.findViewById(R.id.listView);
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.userInterests);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.userInterests);
             listView.setAdapter(arrayAdapter);
 
             return rootView;
