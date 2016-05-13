@@ -312,25 +312,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            USER_ID = Integer.valueOf(response.getString("ID"));
-                            MY_DISPLAY_NAME = email.split("@")[0];
-                            Log.i(TAG, "User id is " + USER_ID);
-                            Log.i(TAG, "Found user: " + email);
-                            proceedToMain();
+                            if (response.getString("Status").contains("Success")) {
+                                USER_ID = Integer.valueOf(response.getString("ID"));
+                                MY_DISPLAY_NAME = email.split("@")[0];
+                                Log.i(TAG, "User id is " + USER_ID);
+                                Log.i(TAG, "Found user: " + email);
+                                proceedToMain();
+                            } else {
+                                addUser(email, password);
+                            }
                         } catch (JSONException e) {
-                            // do nothing
+                            Log.e(TAG, "Made wrong assumptions about JSON", e);
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "Couldn't find user " + email + ", attempting to register.");
-
-                        try {
-                            addUser(email, password);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        Log.e(TAG, "Error when trying to find user " + email + ".");
                     }
                 });
 
@@ -351,7 +349,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     public void onResponse(JSONObject response) {
                         try {
                             Log.i(TAG, "Added user: " + email);
-                            USER_ID = Integer.valueOf(response.getString("ID"));
+                            USER_ID = Integer.valueOf(response.getString("ID")); // Currently not returned by endpoint
                             proceedToMain();
                         } catch (JSONException e) {
                             // do nothing for now
