@@ -17,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -182,6 +181,40 @@ public class MainActivity extends AppCompatActivity {
         // TODO: show the users in the database
     }
 
+    // Out here to allow android:onClick in my_profile.xml
+    public void addInterest(final View view) throws JSONException {
+        EditText interestsText = (EditText) findViewById(R.id.addInterest);
+        assert interestsText != null;
+
+        String url = BASE_URL + "/addInterest";
+
+        // Parse the comma delimited input
+        for (String interest : interestsText.getText().toString().split(",")) {
+            final String trimmed = interest.trim();
+            if (!trimmed.isEmpty()) {
+                final JSONObject jsonRequestBody = new JSONObject();
+                jsonRequestBody.put("id", USER_ID);
+                jsonRequestBody.put("interest", trimmed);
+
+                JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                        (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Log.i(TAG, "Added an interest");
+                                ((EditText) findViewById(R.id.addInterest)).getText().clear();
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.e(TAG, "Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
+                            }
+                        });
+                // Add the request to the RequestQueue.
+                queue.add(jsObjRequest);
+            }
+        }
+    }
+
     public static class PostStreamFragmentContainer extends Fragment {
         // TODO: create and add a view for posts... this will be a container for post fragments
 
@@ -209,9 +242,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class ProfileFragment extends Fragment {
-        // These need to be static so moving addInterest to be local to the ProfileFragment
-        // TODO: create and add a view for the profile
-
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -219,55 +249,8 @@ public class MainActivity extends AppCompatActivity {
             TextView textView = (TextView) rootView.findViewById(R.id.myUsername);
             textView.setText((MainActivity.getUsername() != null) ? MainActivity.getUsername() : "(no username)");
 
-            Button addInterests = (Button) rootView.findViewById(R.id.addInterestButton);
-            addInterests.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        addInterest(view);
-                    } catch (JSONException e) {
-                        // do nothing for now
-                    }
-
-                }
-            });
-
             return rootView;
         }
-
-        public void addInterest(final View view) throws JSONException {
-            EditText interestsText = (EditText) view.findViewById(R.id.addInterest);
-            assert interestsText != null;
-
-            String url = BASE_URL + "/addInterest";
-
-            // Parse the comma delimited input
-            for (String interest : interestsText.getText().toString().split(",")) {
-                final String trimmed = interest.trim();
-                if (!trimmed.isEmpty()) {
-                    final JSONObject jsonRequestBody = new JSONObject();
-                    jsonRequestBody.put("id", USER_ID);
-                    jsonRequestBody.put("interest", trimmed);
-
-                    JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                            (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    Log.i(TAG, "Added an interest");
-                                    ((EditText) view.findViewById(R.id.addInterest)).getText().clear();
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.e(TAG, "Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
-                                }
-                            });
-                    // Add the request to the RequestQueue.
-                    queue.add(jsObjRequest);
-                }
-            }
-        }
-
     }
 
     /**
