@@ -17,7 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -34,16 +36,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
+    static final ArrayList<String> userInterests = new ArrayList<String>();
+    // Model stuff
     private static final String TAG = "MainActivity";
     static String BASE_URL = "http://ec2-54-173-215-12.compute-1.amazonaws.com";
-    static int USER_ID = -1; // this field will store the user ID
-    // Instantiate the RequestQueue.
+    static int USER_ID = -1;
     static RequestQueue queue;
     private static String MY_DISPLAY_NAME;
     private static String EMAIL;
-    final ArrayList<String> userInterests = new ArrayList<String>();
-
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -190,23 +190,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Parse the comma delimited input
         for (String interest : interestsText.getText().toString().split(",")) {
-            final String trimmed = interest.trim();
-            if (!trimmed.isEmpty()) {
+            final String trimmedInterest = interest.trim();
+            if (!trimmedInterest.isEmpty()) {
                 final JSONObject jsonRequestBody = new JSONObject();
                 jsonRequestBody.put("id", USER_ID);
-                jsonRequestBody.put("interest", trimmed);
+                jsonRequestBody.put("interest", trimmedInterest);
 
                 JsonObjectRequest jsObjRequest = new JsonObjectRequest
                         (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
                                 Log.i(TAG, "Added an interest");
+                                userInterests.add(trimmedInterest);
                                 ((EditText) findViewById(R.id.addInterest)).getText().clear();
                             }
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.e(TAG, "Adding interest \"" + trimmed + "\" failed with error: " + error.toString());
+                                Log.e(TAG, "Adding interest \"" + trimmedInterest + "\" failed with error: " + error.toString());
                             }
                         });
                 // Add the request to the RequestQueue.
@@ -246,8 +247,13 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.my_profile, container, false);
+
             TextView textView = (TextView) rootView.findViewById(R.id.myUsername);
             textView.setText((MainActivity.getUsername() != null) ? MainActivity.getUsername() : "(no username)");
+
+            ListView listView = (ListView) rootView.findViewById(R.id.listView);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.userInterests);
+            listView.setAdapter(arrayAdapter);
 
             return rootView;
         }
