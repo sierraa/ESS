@@ -219,7 +219,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("USER_ID", USER_ID);
         intent.putExtra("MY_DISPLAY_NAME", MY_DISPLAY_NAME);
-        intent.putExtra("EMAIL", mEmailView.getText());
+        intent.putExtra("EMAIL", mEmailView.getText().toString());
         startActivity(intent);
     }
 
