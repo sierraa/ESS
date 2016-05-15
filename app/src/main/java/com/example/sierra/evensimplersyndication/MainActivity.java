@@ -1,5 +1,6 @@
 package com.example.sierra.evensimplersyndication;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -26,6 +27,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -34,8 +36,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    static final List<String> users = new ArrayList<>();
     static final ArrayList<String> userInterests = new ArrayList<>();
     // Model stuff
     private static final String TAG = "MainActivity";
@@ -89,11 +93,11 @@ public class MainActivity extends AppCompatActivity {
         setTitle("ESS");
 
         try {
+            getUsers();
             getPosts(USER_ID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -177,8 +181,32 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsObjRequestGet);
     }
 
-    private void getUsers() {
-        // TODO: show the users in the database
+    public void getUsers() {
+        String url = BASE_URL + "/getUsers";
+        final JSONArray jsonRequestBody = new JSONArray();
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest
+                (Request.Method.GET, url, jsonRequestBody, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject o = response.getJSONObject(i);
+                                Log.i(TAG, "Adding user " + o.get("name"));
+                                users.add("" + o.get("name"));
+                            }
+                            Log.i(TAG, "Successfully fetched users.");
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Getting users failed with JSONException " + e.toString());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Getting users failed with error: " + error.toString());
+                    }
+                });
+
+        queue.add(jsObjRequest);
     }
 
     // Out here to allow android:onClick in my_profile.xml
@@ -217,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class PostStreamFragmentContainer extends Fragment {
-        // TODO: create and add a view for posts... this will be a container for post fragments
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -225,21 +252,41 @@ public class MainActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(R.string.postsHere);
+
+//            JSONObject myInterests = getMyInterests();
+//            ArrayList<JSONObject> posts = getPosts(myInterests);
+//
+//            for (int i = 0; i < Math.min(5, posts.size()); i++) {
+//                // add the posts to list view
+//            }
             return rootView;
         }
+
+        public ArrayList<JSONObject> getPosts(JSONObject interests) {
+            return null;
+        }
+
+        public JSONObject getMyInterests() {
+            // TODO
+            return null;
+        }
+
     }
 
     public static class UsersFragmentContainer extends Fragment {
-        // TODO: create and add a view for the users... this will be a container for user fragments
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(R.string.usersHere);
+
+            ListView listView = (ListView) rootView.findViewById(R.id.item_list);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.users);
+            listView.setAdapter(arrayAdapter);
+
             return rootView;
         }
+
     }
 
     public static class ProfileFragment extends Fragment {
@@ -340,41 +387,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-//    public void selectInterest(View view) throws JSONException {
-//        queue = Volley.newRequestQueue(this);
-//        EditText userIdText = (EditText) findViewById(R.id.select_user_interest_edit_text);
-//        final String userid = userIdText.getText().toString();
-//        String url = baseurl + "/getInterestsByUserID";
-//        final TextView selectUserInterestStatusText = (TextView) findViewById(R.id.select_interest__status_banner);
-//
-//        final JSONObject jsonRequestBody = new JSONObject("{\"id\":\"" + userid + "\"}");
-//        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-//                (Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONObject>() {
-//
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        try {
-//                            String interests = "";
-//                            JSONArray interestsArr = response.getJSONArray("interests");
-//                            if (interestsArr.length() > 0) {
-//                                interests += interestsArr.get(0);
-//                            }
-//                            for (int i = 1; i < interestsArr.length(); i++) {
-//                                interests += ", " + interestsArr.get(i);
-//                            }
-//                            selectUserInterestStatusText.setText("User with id: " + response.get("id") + " has these interests: " + interests);
-//                        } catch (JSONException e) {
-//                            selectUserInterestStatusText.setText("Response JSON malformed: " + response.toString());
-//                        }
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        selectUserInterestStatusText.setText("Could not fetch user interests with id: " + userid + ", with error: " + error.toString());
-//                    }
-//                });
-//        // Add the request to the RequestQueue.
-//        queue.add(jsObjRequest);
-//    }
-//}

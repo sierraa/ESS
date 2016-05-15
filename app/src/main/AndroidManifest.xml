@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.sierra.evensimplersyndication" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -33,6 +33,15 @@
             android:label="@string/title_activity_settings" >
         </activity>
         <activity android:name=".NewPostActivity" >
+        </activity>
+        <activity
+            android:name=".ScrollListActivity"
+            android:label="@string/title_activity_scroll_list"
+            android:parentActivityName="android.app.ListActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="android.app.ListActivity" />
         </activity>
     </application>
 
