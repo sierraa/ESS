@@ -284,6 +284,8 @@ public class MainActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             ListView listView = (ListView) rootView.findViewById(R.id.item_list);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.posts);
+            listView.setAdapter(arrayAdapter);
 
             return rootView;
         }
