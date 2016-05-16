@@ -1,8 +1,7 @@
 package com.example.sierra.evensimplersyndication;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
@@ -15,6 +14,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -101,8 +101,9 @@ public class NewPostActivity extends AppCompatActivity {
         JSONObject jsonRequestBody = new JSONObject();
         jsonRequestBody.put("url", Url);
         jsonRequestBody.put("id", String.valueOf(userID));
-        jsonRequestBody.put("post", description);
-        jsonRequestBody.put("interests", "[" + TextUtils.join(",", tags) + "]");
+        jsonRequestBody.put("description", description);
+        jsonRequestBody.put("interests", new JSONArray(tags));
+
         String requestUrl = BASE_URL + "/addPost";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.POST, requestUrl, jsonRequestBody, new Response.Listener<JSONObject>(){
