@@ -166,13 +166,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Log.i(TAG, "Successfully fetched posts.");
                 } catch (JSONException e) {
-                    Log.e(TAG, "Getting posts failed with JSONException " + e.toString());
+                    Log.e(TAG, "Getting posts failed with JSONException", e);
                 }
 
             }} ,new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG, "Getting users failed with error: " + error.toString());
+                    Log.e(TAG, "Getting posts failed with VolleyError", error);
                 }
             });
         queue.add(jsObjRequest);
@@ -201,8 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "Finding interests of user with ID " + userID + " failed. " +
-                                "With request JSON: " + jsonRequestBody.toString()
-                                + ", and error: " + error.toString());
+                                "With request JSON: " + jsonRequestBody.toString(), error);
                     }
                 });
         // Add the request to the RequestQueue.
@@ -225,13 +224,13 @@ public class MainActivity extends AppCompatActivity {
                             }
                             Log.i(TAG, "Successfully fetched users.");
                         } catch (JSONException e) {
-                            Log.e(TAG, "Getting users failed with JSONException " + e.toString());
+                            Log.e(TAG, "Getting users failed with JSONException", e);
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "Getting users failed with error: " + error.toString());
+                        Log.e(TAG, "Getting users failed with VolleyError", error);
                     }
                 });
 
@@ -264,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.e(TAG, "Adding interest \"" + trimmedInterest + "\" failed with error: " + error.toString());
+                                Log.e(TAG, "Adding interest \"" + trimmedInterest + "\" failed with VolleyError", error);
                             }
                         });
                 // Add the request to the RequestQueue.
