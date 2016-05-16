@@ -80,7 +80,7 @@ public class NewPostActivity extends AppCompatActivity {
     }
 
     private boolean isValidUrl(String url) {
-        return URLUtil.isValidUrl(url);
+        return URLUtil.isValidUrl(URLUtil.guessUrl(url));
     }
 
     private boolean hasValidInterests(String[] interests) {
