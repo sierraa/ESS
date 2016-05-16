@@ -31,6 +31,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -209,13 +210,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } catch (JSONException e) {
                 showLoginMessage("YIKES!!!!!!!!!");
             }
-            showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
         }
     }
 
-    private void proceedToMain() {
+    private void proceedToMain(String email, String password) {
+        showProgress(true);
+        mAuthTask = new UserLoginTask(email, password);
+        mAuthTask.execute((Void) null);
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("USER_ID", USER_ID);
         intent.putExtra("MY_DISPLAY_NAME", MY_DISPLAY_NAME);
@@ -317,7 +318,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 MY_DISPLAY_NAME = email.split("@")[0];
                                 Log.i(TAG, "User id is " + USER_ID);
                                 Log.i(TAG, "Found user: " + email);
-                                proceedToMain();
+                                proceedToMain(email, password);
                             } else {
                                 addUser(email, password);
                             }
@@ -329,6 +330,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "Error when trying to find user " + email + ".");
+
+                        // This is printed a bit late, maybe shorten request timeout.
+                        Context context = getApplicationContext();
+                        CharSequence text = "Couldn't connect to server. Try again later.";
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
                     }
                 });
 
@@ -336,7 +345,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         queue.add(jsObjRequestGet);
     }
 
-    private void addUser(final String email, String password) throws JSONException {
+    private void addUser(final String email, final String password) throws JSONException {
         final String addUrl = BASE_URL + "/addUser";
 
         final JSONObject jsonRequestBody = new JSONObject();
@@ -350,7 +359,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         try {
                             Log.i(TAG, "Added user: " + email);
                             USER_ID = Integer.valueOf(response.getString("ID")); // Currently not returned by endpoint
-                            proceedToMain();
+                            proceedToMain(email, password);
                         } catch (JSONException e) {
                             // do nothing for now
                         }
