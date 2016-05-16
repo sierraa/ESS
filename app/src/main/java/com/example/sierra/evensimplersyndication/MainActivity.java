@@ -149,9 +149,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getPosts(int userID) throws JSONException {
-       //  getInterests(userID)
-       // /getPostsForUserID
-        String url = BASE_URL + "/getPostsForUserID";
+        String url = BASE_URL + "/getPostsByUserID"; // TODO: Add parameter for choosing between this and getPostsForUserID
         final JSONObject jsonRequestBody = new JSONObject();
         jsonRequestBody.put("id", USER_ID);
         JsonRequest jsObjRequest = new PostObjGetArrayRequest (
@@ -161,8 +159,8 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject o = response.getJSONObject(i);
-                        Log.i(TAG, "Fetching post " + o.get("post"));
-                        posts.add("" + o.get("post"));
+                        Log.i(TAG, "Fetching post " + o.getString("description"));
+                        posts.add(o.getString("description"));
                     }
                     Log.i(TAG, "Successfully fetched posts.");
                 } catch (JSONException e) {
