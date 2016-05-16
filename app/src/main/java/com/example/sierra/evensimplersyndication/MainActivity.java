@@ -23,23 +23,29 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     static final List<String> users = new ArrayList<>();
+    static final List<String> posts = new ArrayList<String>();
     static final ArrayList<String> userInterests = new ArrayList<>();
     // Model stuff
     private static final String TAG = "MainActivity";
@@ -146,8 +152,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getPosts(int userID) throws JSONException {
-        // TODO: connect routes. Retrieve some posts relevant to this user.
-        getInterests(userID);
+       //  getInterests(userID)
+       // /getPostsForUserID
+        String url = BASE_URL + "/getPostsForUserID";
+        final JSONObject jsonRequestBody = new JSONObject();
+        jsonRequestBody.put("id", USER_ID);
+        JsonRequest jsObjRequest = new PostObjGetArrayRequest (
+                Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject o = response.getJSONObject(i);
+                        Log.i(TAG, "Fetching post " + o.get("post"));
+                        posts.add("" + o.get("post"));
+                    }
+                    Log.i(TAG, "Successfully fetched posts.");
+                } catch (JSONException e) {
+                    Log.e(TAG, "Getting posts failed with JSONException " + e.toString());
+                }
+
+            }} ,new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, "Getting users failed with error: " + error.toString());
+                }
+            });
+        queue.add(jsObjRequest);
     }
 
     // Shouldn't return anything since the request is asynchronous
@@ -184,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
     public void getUsers() {
         String url = BASE_URL + "/getUsers";
         final JSONArray jsonRequestBody = new JSONArray();
+
         JsonArrayRequest jsObjRequest = new JsonArrayRequest
                 (Request.Method.GET, url, jsonRequestBody, new Response.Listener<JSONArray>() {
                     @Override
@@ -250,25 +282,10 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(R.string.postsHere);
 
-//            JSONObject myInterests = getMyInterests();
-//            ArrayList<JSONObject> posts = getPosts(myInterests);
-//
-//            for (int i = 0; i < Math.min(5, posts.size()); i++) {
-//                // add the posts to list view
-//            }
+            ListView listView = (ListView) rootView.findViewById(R.id.item_list);
+
             return rootView;
-        }
-
-        public ArrayList<JSONObject> getPosts(JSONObject interests) {
-            return null;
-        }
-
-        public JSONObject getMyInterests() {
-            // TODO
-            return null;
         }
 
     }
@@ -387,3 +404,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
