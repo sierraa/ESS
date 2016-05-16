@@ -23,13 +23,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
@@ -39,13 +36,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     static final List<String> users = new ArrayList<>();
-    static final List<String> posts = new ArrayList<String>();
+    static final List<String> posts = new ArrayList<>();
     static final ArrayList<String> userInterests = new ArrayList<>();
     // Model stuff
     private static final String TAG = "MainActivity";
@@ -100,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             getUsers();
+            getInterests(USER_ID);
             getPosts(USER_ID);
         } catch (JSONException e) {
             e.printStackTrace();
