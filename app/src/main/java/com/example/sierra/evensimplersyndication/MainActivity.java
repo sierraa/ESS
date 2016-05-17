@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onResponse(JSONObject response) {
                                 Log.i(TAG, "Added an interest");
                                 userInterests.add(trimmedInterest);
+                                ((ArrayAdapter) ((ListView) findViewById(R.id.listView)).getAdapter()).notifyDataSetChanged();
                                 ((EditText) findViewById(R.id.addInterest)).getText().clear();
                             }
                         }, new Response.ErrorListener() {
