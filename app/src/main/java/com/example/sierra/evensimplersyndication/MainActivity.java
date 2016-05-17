@@ -2,6 +2,7 @@ package com.example.sierra.evensimplersyndication;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -310,6 +312,14 @@ public class MainActivity extends AppCompatActivity {
             PostAdapter adapter = new PostAdapter(getActivity(), posts, getResources());
             listView.setAdapter(adapter);
             return rootView;
+        }
+
+        @Override
+        public void onListItemClick(ListView l, View v, int position, long id) {
+            //PostModel p = (PostModel) getListView().getItemAtPosition(position);
+            String url = posts.get(position).getUrl();
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
         }
 
     }
