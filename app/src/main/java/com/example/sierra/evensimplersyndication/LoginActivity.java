@@ -66,7 +66,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String TAG = "LoginActivity";
     String BASE_URL ="http://ec2-54-173-215-12.compute-1.amazonaws.com";
     int USER_ID = -1;
-    String MY_DISPLAY_NAME;
     // Instantiate the RequestQueue.
     RequestQueue queue;
     /**
@@ -219,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mAuthTask.execute((Void) null);
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("USER_ID", USER_ID);
-        intent.putExtra("MY_DISPLAY_NAME", MY_DISPLAY_NAME);
+        intent.putExtra("MY_DISPLAY_NAME", email.split("@")[0]);
         intent.putExtra("EMAIL", mEmailView.getText().toString());
         startActivity(intent);
     }
@@ -315,7 +314,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         try {
                             if (response.getString("Status").contains("Success")) {
                                 USER_ID = Integer.valueOf(response.getString("ID"));
-                                MY_DISPLAY_NAME = email.split("@")[0];
                                 Log.i(TAG, "User id is " + USER_ID);
                                 Log.i(TAG, "Found user: " + email);
                                 proceedToMain(email, password);
