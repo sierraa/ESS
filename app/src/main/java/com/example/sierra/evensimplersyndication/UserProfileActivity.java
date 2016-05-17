@@ -26,6 +26,7 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setTitle(displayedUser.getName());
         TextView name = (TextView) findViewById(R.id.userDisplayName);
         name.setText(displayedUser.getName());
 
