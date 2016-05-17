@@ -2,6 +2,7 @@ package com.example.sierra.evensimplersyndication;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 
 public class NewPostActivity extends AppCompatActivity {
 
+    static final String TAG = "NewPostActivity";
     static final int POST_CHAR_LIMIT = 160;
     static final ArrayList<String> VALID_INTERESTS = new ArrayList<String>(Arrays.asList("python")); // TODO: Add more interests (but not too many more)
     static final String BASE_URL ="http://ec2-54-173-215-12.compute-1.amazonaws.com";
@@ -84,12 +86,12 @@ public class NewPostActivity extends AppCompatActivity {
     }
 
     private boolean hasValidInterests(String[] interests) {
-        for (String i : interests) {
-            if (!VALID_INTERESTS.contains(i)) {
-                interestsField.setError(getString(R.string.error_invalid_tags));
-                return false;
-            }
-        }
+//        for (String i : interests) {
+//            if (!VALID_INTERESTS.contains(i)) {
+//                interestsField.setError(getString(R.string.error_invalid_tags));
+//                return false;
+//            }
+//        }
         return true;
     }
 
@@ -109,13 +111,13 @@ public class NewPostActivity extends AppCompatActivity {
                 (Request.Method.POST, requestUrl, jsonRequestBody, new Response.Listener<JSONObject>(){
                     @Override
                           public void onResponse(JSONObject response) {
-                              System.out.println("Added post.");
+                              Log.i(TAG, "Added post.");
                           }
                       }, new Response.ErrorListener() {
 
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                System.out.println("Could not add post.");
+                                Log.e(TAG, "Could not add post.");
                             }
                 });
         queue.add(jsObjRequest);
