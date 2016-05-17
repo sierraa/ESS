@@ -84,4 +84,5 @@
     <string name="postsHere">Here are where the posts will be.</string>
     <string name="usersHere">Here are the users</string>
     <string name="title_activity_scroll_list">ScrollListActivity</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
 </resources>

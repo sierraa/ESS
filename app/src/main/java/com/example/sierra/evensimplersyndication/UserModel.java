@@ -1,9 +1,11 @@
 package com.example.sierra.evensimplersyndication;
 
+import java.io.Serializable;
+
 /**
  * Created by Sierra on 5/16/2016.
  */
-public class UserModel {
+public class UserModel implements Serializable {
 
     private int user_id;
     private String[] interests;

@@ -34,14 +34,11 @@
         </activity>
         <activity android:name=".NewPostActivity" >
         </activity>
+
         <activity
-            android:name=".ScrollListActivity"
-            android:label="@string/title_activity_scroll_list"
-            android:parentActivityName="android.app.ListActivity"
+            android:name=".UserProfileActivity"
+            android:label="@string/title_activity_user_profile"
             android:theme="@style/AppTheme.NoActionBar" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="android.app.ListActivity" />
         </activity>
     </application>
 

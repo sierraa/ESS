@@ -316,7 +316,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onListItemClick(ListView l, View v, int position, long id) {
-            //PostModel p = (PostModel) getListView().getItemAtPosition(position);
             String url = posts.get(position).getUrl();
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(browserIntent);
@@ -337,6 +336,16 @@ public class MainActivity extends AppCompatActivity {
             UserAdapter adapter = new UserAdapter(getActivity(), users, getResources());
             listView.setAdapter(adapter);
             return rootView;
+        }
+
+        @Override
+        public void onListItemClick(ListView l, View v, int position, long id) {
+            UserModel usr = users.get(position);
+            //Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            // startActivity(browserIntent);
+            Intent i = new Intent(getActivity(), UserProfileActivity.class);
+            i.putExtra("user", usr);
+            startActivity(i);
         }
 
     }
