@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     static final boolean DEMO = true;
 
     static final List<UserModel> users = new ArrayList<>();
-    static final List<String> posts = new ArrayList<>();
+    static final List<PostModel> posts = new ArrayList<>();
     static final ArrayList<String> userInterests = new ArrayList<>();
     // Model stuff
     private static final String TAG = "MainActivity";
@@ -101,9 +101,7 @@ public class MainActivity extends AppCompatActivity {
         setTitle("ESS");
 
         try {
-            getUsers();
             getInterests(USER_ID);
-            //getPosts(USER_ID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -114,6 +112,10 @@ public class MainActivity extends AppCompatActivity {
             users.add(new UserModel(777, "Maria", new String[] {"Java", "Racket", "iOS"}));
             users.add(new UserModel(555, "Nina", new String[] {"Windows", "Android", "Google"}));
             users.add(new UserModel(888, "Chloe", new String[] {"Machine Learning", "Deep Learning", "R"}));
+            posts.add(new PostModel("https://www.python.org", 666, "Jessica", "Python is great.", new String[] {"Python", "Programming"}));
+        } else {
+            getUsers();
+            // getPosts(USER_ID);
         }
 
         // Set up the ViewPager with the sections adapter.
@@ -175,7 +177,8 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject o = response.getJSONObject(i);
                         Log.i(TAG, "Fetching post " + o.get("post"));
-                        posts.add("" + o.get("post"));
+                        posts.add(new PostModel(o.getString("url"), o.getInt("id"), getUsernameFromID(o.getInt("id")), o.getString("post"),
+                                o.getString("interests").split(",")));
                     }
                     Log.i(TAG, "Successfully fetched posts.");
                 } catch (JSONException e) {
@@ -189,6 +192,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         queue.add(jsObjRequest);
+    }
+
+    public String getUsernameFromID(int id) {
+        for (UserModel u : users) {
+            if (u.getUser_id() == id) {
+                return u.getName();
+            }
+        }
+        return "User";
     }
 
     // Shouldn't return anything since the request is asynchronous
@@ -286,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class PostStreamFragmentContainer extends Fragment {
+    public static class PostStreamFragmentContainer extends ListFragment {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -294,9 +306,8 @@ public class MainActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             ListView listView = (ListView) rootView.findViewById(android.R.id.list);
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.posts);
-            listView.setAdapter(arrayAdapter);
-
+            PostAdapter adapter = new PostAdapter(getActivity(), posts, getResources());
+            listView.setAdapter(adapter);
             return rootView;
         }
 
@@ -307,13 +318,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            // may want to cchange back idk
+
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             ListView listView = (ListView) rootView.findViewById(android.R.id.list);
 
-            // ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_2, MainActivity.users);
-            // listView.setAdapter(arrayAdapter);
             UserAdapter adapter = new UserAdapter(getActivity(), users, getResources());
             listView.setAdapter(adapter);
             return rootView;

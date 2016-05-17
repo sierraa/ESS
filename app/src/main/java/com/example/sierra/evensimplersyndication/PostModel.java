@@ -8,12 +8,14 @@ public class PostModel {
     private int user_id; // user who posted this
     private String description ;
     private String[] interests;
+    private String username;
 
-    public PostModel(String url, int user_id, String description, String[] interests) {
+    public PostModel(String url, int user_id, String username, String description, String[] interests) {
         this.url = url;
         this.user_id = user_id;
         this.description = description;
         this.interests = interests;
+        this.username = username;
     }
 
     public String getUrl() {
@@ -23,6 +25,8 @@ public class PostModel {
     public int getUser_id() {
         return user_id;
     }
+
+    public String getUserName() {return username; }
 
     public String getDescription() {
         return description;
