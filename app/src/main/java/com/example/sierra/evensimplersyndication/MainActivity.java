@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -37,10 +38,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    static final List<String> users = new ArrayList<>();
+    static final boolean DEMO = true;
+
+    static final List<UserModel> users = new ArrayList<>();
     static final List<String> posts = new ArrayList<>();
     static final ArrayList<String> userInterests = new ArrayList<>();
     // Model stuff
@@ -97,9 +103,17 @@ public class MainActivity extends AppCompatActivity {
         try {
             getUsers();
             getInterests(USER_ID);
-            getPosts(USER_ID);
+            //getPosts(USER_ID);
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+        if (DEMO) {
+            users.add(new UserModel(666, "Jessica", new String[] {"Python", "Java", "Databases"}));
+            users.add(new UserModel(999, "Rhonda", new String[] {"C++", "Standard ML", "Lisp"}));
+            users.add(new UserModel(777, "Maria", new String[] {"Java", "Racket", "iOS"}));
+            users.add(new UserModel(555, "Nina", new String[] {"Windows", "Android", "Google"}));
+            users.add(new UserModel(888, "Chloe", new String[] {"Machine Learning", "Deep Learning", "R"}));
         }
 
         // Set up the ViewPager with the sections adapter.
@@ -149,11 +163,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getPosts(int userID) throws JSONException {
-       //  getInterests(userID)
-       // /getPostsForUserID
+        Log.i(TAG, "Attempting to get posts for user:" + userID);
         String url = BASE_URL + "/getPostsForUserID";
         final JSONObject jsonRequestBody = new JSONObject();
-        jsonRequestBody.put("id", USER_ID);
+        jsonRequestBody.put("id", userID);
         JsonRequest jsObjRequest = new PostObjGetArrayRequest (
                 Request.Method.POST, url, jsonRequestBody, new Response.Listener<JSONArray>() {
             @Override
@@ -220,7 +233,8 @@ public class MainActivity extends AppCompatActivity {
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject o = response.getJSONObject(i);
                                 Log.i(TAG, "Adding user " + o.get("name"));
-                                users.add("" + o.get("name"));
+                                users.add(new UserModel(o.getInt("id"), o.getString("name"),
+                                         o.getString("interests").split(",")));
                             }
                             Log.i(TAG, "Successfully fetched users.");
                         } catch (JSONException e) {
@@ -279,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-            ListView listView = (ListView) rootView.findViewById(R.id.item_list);
+            ListView listView = (ListView) rootView.findViewById(android.R.id.list);
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.posts);
             listView.setAdapter(arrayAdapter);
 
@@ -288,17 +302,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static class UsersFragmentContainer extends Fragment {
+    public static class UsersFragmentContainer extends ListFragment {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            // may want to cchange back idk
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-            ListView listView = (ListView) rootView.findViewById(R.id.item_list);
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_1, MainActivity.users);
-            listView.setAdapter(arrayAdapter);
+            ListView listView = (ListView) rootView.findViewById(android.R.id.list);
 
+            // ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_activated_2, MainActivity.users);
+            // listView.setAdapter(arrayAdapter);
+            UserAdapter adapter = new UserAdapter(getActivity(), users, getResources());
+            listView.setAdapter(adapter);
             return rootView;
         }
 
